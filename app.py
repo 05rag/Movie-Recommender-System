@@ -19,9 +19,11 @@ def download_file(url, filename):
         with open(filename, 'wb') as f:
             f.write(response.content)
 
+if not os.path.exists("similarity.pkl"):
+    gdown.download("https://drive.google.com/uc?export=download&id=1id22zj0qas2briT9awgLO37wqzgvNrg_", "similarity.pkl", quiet=False)
 
-gdown.download("https://drive.google.com/uc?export=download&id=1DVNxZWKBQxs_n1t2AOgv0hzhyE0-dwkd", "similarity.pkl", quiet=False)
-gdown.download("https://drive.google.com/uc?export=download&id=1O5ub24ftIjGTMLA9R51hltQVUA41a8bs", "movie_dict.pkl",quiet=False)
+if not os.path.exists("movie_dict.pkl"):
+    gdown.download("https://drive.google.com/uc?id=1O5ub24ftIjGTMLA9R51hltQVUA41a8bs", "movie_dict.pkl", quiet=False)
 
 @st.cache_resource
 def load_data():
@@ -32,6 +34,7 @@ def load_data():
 similarity, movie_dict = load_data()
 
 movies = pd.DataFrame(movie_dict)
+movie_to_index = {title: idx for idx, title in enumerate(movies['title'])}
 
 @st.cache_data
 def fetch_poster(movie_id):
@@ -56,17 +59,18 @@ def fetch_all_posters(movie_ids):
         return list(executor.map(fetch_poster, movie_ids))
 
 
-def recommend(movie):
-    movie_index = movies[movies['title'] == movie].index[0]
-    distances = similarity[movie_index]
-    movies_list = sorted(list(enumerate(distances)), reverse=True, key=lambda x: x[1])[1:6]
+def recommend(movie, top_n=6):
+    movie_index = movie_to_index.get(movie)
 
-    recommended_movie_list = []
+    if movie_index is None:
+        return [], []
+
+    recommendations = similarity[movie_index]
+
     movie_ids = []
-    recommended_movie_posters = []
+    recommended_movie_list = []
 
-    for i in movies_list:
-
+    for i in recommendations[:top_n]:
         movie_id = int(movies.iloc[i[0]].movie_id)
         movie_ids.append(movie_id)
         recommended_movie_list.append(movies.iloc[i[0]].title)
