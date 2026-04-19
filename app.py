@@ -5,6 +5,7 @@ import requests
 import os
 from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor
+import gdown
 load_dotenv()
 API_KEY = os.getenv('TMDB_API_KEY')
 
@@ -19,8 +20,8 @@ def download_file(url, filename):
             f.write(response.content)
 
 
-download_file("YOUR_SIMILARITY_LINK", "similarity.pkl")
-download_file("YOUR_MOVIE_DICT_LINK", "movie_dict.pkl")
+gdown.download("https://drive.google.com/uc?export=download&id=1DVNxZWKBQxs_n1t2AOgv0hzhyE0-dwkd", "similarity.pkl", quiet=False)
+gdown.download("https://drive.google.com/uc?export=download&id=1O5ub24ftIjGTMLA9R51hltQVUA41a8bs", "movie_dict.pkl",quiet=False)
 
 @st.cache_resource
 def load_data():
