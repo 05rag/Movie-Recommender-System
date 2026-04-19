@@ -1,0 +1,6 @@
+# Ignore sensitive & unnecessary files
+.env
+.idea/
+similarity.pkl
+movie_dict.pkl
+__pycache__/
