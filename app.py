@@ -70,7 +70,8 @@ def recommend(movie, top_n=6):
     movie_ids = []
     recommended_movie_list = []
 
-    for i in recommendations[:top_n]:
+    for i in recommendations[:top_n ]:
+        print(f"DEBUG: Index: {i[0]}, ID: {movies.iloc[i[0]].movie_id}")
         movie_id = int(movies.iloc[i[0]].movie_id)
         movie_ids.append(movie_id)
         recommended_movie_list.append(movies.iloc[i[0]].title)
@@ -83,13 +84,12 @@ def recommend(movie, top_n=6):
 option = st.selectbox('Select a movie to get recommendations.', movies['title'].values)
 
 if st.button('Recommend'):
-    names, posters = recommend(option)
+    names, posters = recommend(option, top_n=5) # Ensure this matches range below
 
-    with st.container():
-        cols = st.columns(5)
-        for i in range(5):
-            with cols[i]:
-                # 2. Use a container for the individual card
-                with st.container(border=True):
-                    st.image(posters[i], use_container_width=True)
-                    st.caption(names[i])
+    # Grid layout for 5 movies
+    cols = st.columns(5)
+    for i in range(5):
+        with cols[i]:
+            with st.container(border=True):
+                st.image(posters[i], use_container_width=True)
+                st.caption(names[i])
